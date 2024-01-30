@@ -4,4 +4,6 @@ This number can then be compared against the image file count, to ensure no bonu
 Provided without guarantee, whipped up pretty quickly. Has some commentary. 
 If you add geopandas, you could very easily use it to convert the eif to shp for another process, but most GIS tools can do this already.
 
-Todo - disclaimer, may never be done: modularise this script further.
+TODO - disclaimer, may never actually be done: 
+- modularise this script further
+- argv, to make editign script to set path unnecessary.
