@@ -9,3 +9,4 @@ REQUIRES: py 3.7+, pandas, os, itertools.
 TODO - disclaimer, may never actually be done: 
 - modularise this script further
 - argv, to make editign script to set path unnecessary.
+- simplify and improve the readability of the dataCheck and checkLooksRight - the "business end" of these could be written as a oneliner lambda, but not today!
