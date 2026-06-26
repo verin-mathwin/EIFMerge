@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from itertools import *
 
-eifFolder = r"YOUR FOLDER PATH HERE"
+eifFolder = r"YOUR PATH HERE"
 
 def findEIFs(pathIn):
     """
@@ -87,6 +87,45 @@ def scrapeEIF(eifPath):
             epd = pd.DataFrame(data, columns=headers)
     return epd
 
+
+def writeMerge(df, pth):
+    outPath = os.path.join(pth, "merged_eif.eif")
+    # still need something to insert header??
+
+    df = df.copy()
+
+    # ----------------------------------------------------------
+    # Remove rows with missing roll values
+    # ----------------------------------------------------------
+    df["roll[deg]"] = pd.to_numeric(df["roll[deg]"], errors="coerce")
+    df = df.dropna(subset=["roll[deg]"])
+
+    # ----------------------------------------------------------
+    # Correct time-of-day rollover (midnight crossing)
+    # ----------------------------------------------------------
+    df["time[s]"] = pd.to_numeric(df["time[s]"], errors="coerce")
+
+    rollover = 0
+    corrected = []
+
+    previous = df["time[s]"].iloc[0]
+
+    for t in df["time[s]"]:
+        if t < previous:
+            rollover += 86400
+        corrected.append(t + rollover)
+        previous = t
+
+    df["time[s]"] = corrected
+
+    # ----------------------------------------------------------
+    # Reset index
+    # ----------------------------------------------------------
+    df.reset_index(drop=True, inplace=True)
+
+    # Write
+    df.to_csv(outPath, sep=";", index=False)
+
 if __name__ == "__main__":
     print('#################################')
     print('Starting EIF scraper...')
@@ -110,6 +149,7 @@ if __name__ == "__main__":
         merged = pd.concat(pdList)
         print('#################################')
         print(len(merged), 'events have been recorded')
+        writeMerge(merged, eifFolder)
     except ValueError:
         print('No files successfully scraped')
     if len(issues) > 0:
@@ -118,6 +158,8 @@ if __name__ == "__main__":
             print(os.path.basename(a))
     else:
         print('No files had issues')
+
+    
     
     
         
